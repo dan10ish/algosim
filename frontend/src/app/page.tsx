@@ -5,7 +5,18 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { TradingChart } from '@/components/trading-chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { 
+    TrendingUp, 
+    TrendingDown, 
+    DollarSign, 
+    Activity, 
+    ArrowUpDown, 
+    Users, 
+    Clock, 
+    BarChart3,
+    Wifi,
+    WifiOff
+} from "lucide-react";
 
 // Define types for WebSocket messages
 interface BookMessage {
@@ -90,11 +101,13 @@ export default function Home() {
                 
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex items-center gap-3">
+                        <BarChart3 className="h-8 w-8 text-primary" />
                         <h1 className="text-3xl font-bold">AlgoSim</h1>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400 animate-pulse'}`}></div>
+                        {isConnected ? <Wifi className="h-4 w-4 text-green-600" /> : <WifiOff className="h-4 w-4 text-red-600" />}
                         <Badge 
                             variant={isConnected ? "default" : "destructive"}
                             className={isConnected 
@@ -111,7 +124,10 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Best Bid/Ask</CardDescription>
+                            <div className="flex items-center gap-2">
+                                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                                <CardDescription>Best Bid/Ask</CardDescription>
+                            </div>
                             <CardTitle className="text-lg tabular-nums">${topBid.toFixed(2)} / ${topAsk.toFixed(2)}</CardTitle>
                             <CardDescription className="text-sm">Market depth: {bidDepth.toFixed(0)} / {askDepth.toFixed(0)}</CardDescription>
                         </CardHeader>
@@ -119,7 +135,10 @@ export default function Home() {
                     
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Last Price</CardDescription>
+                            <div className="flex items-center gap-2">
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                                <CardDescription>Last Price</CardDescription>
+                            </div>
                             <CardTitle className="text-2xl tabular-nums">${lastTradePrice.toFixed(2)}</CardTitle>
                             <CardDescription>Session: ${sessionLow.toFixed(2)} - ${sessionHigh.toFixed(2)}</CardDescription>
                         </CardHeader>
@@ -127,7 +146,10 @@ export default function Home() {
                     
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Bid-Ask Spread</CardDescription>
+                            <div className="flex items-center gap-2">
+                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                                <CardDescription>Bid-Ask Spread</CardDescription>
+                            </div>
                             <CardTitle className="text-2xl tabular-nums">${spread.toFixed(2)}</CardTitle>
                             <CardDescription>{spreadPercent}% of mid price</CardDescription>
                         </CardHeader>
@@ -135,7 +157,10 @@ export default function Home() {
                     
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Trading Activity</CardDescription>
+                            <div className="flex items-center gap-2">
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                                <CardDescription>Trading Activity</CardDescription>
+                            </div>
                             <CardTitle className="text-2xl tabular-nums">{tradesPerMinute}</CardTitle>
                             <CardDescription>Trades per minute • Total vol: {totalVolume.toLocaleString()}</CardDescription>
                         </CardHeader>
@@ -152,9 +177,12 @@ export default function Home() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <div className="space-y-1">
-                                <CardTitle className="text-sm font-medium">
-                                    <span className="text-green-600 dark:text-green-400">Bids</span>
-                                </CardTitle>
+                                <div className="flex items-center gap-2">
+                                    <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    <CardTitle className="text-sm font-medium">
+                                        <span className="text-green-600 dark:text-green-400">Bids</span>
+                                    </CardTitle>
+                                </div>
                                 <CardDescription>
                                     {bookData.bids.length} buy orders
                                 </CardDescription>
@@ -164,15 +192,15 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-md m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
-                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                        <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-left align-middle font-medium">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-right align-middle font-medium">
                                                     Size
                                                 </th>
                                             </tr>
@@ -181,7 +209,10 @@ export default function Home() {
                                             {bookData.bids.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={2} className="h-24 text-center text-muted-foreground p-2">
-                                                        No bid orders
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <Users className="h-4 w-4" />
+                                                            No bid orders
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -207,9 +238,12 @@ export default function Home() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <div className="space-y-1">
-                                <CardTitle className="text-sm font-medium">
-                                    <span className="text-red-600 dark:text-red-400">Asks</span>
-                                </CardTitle>
+                                <div className="flex items-center gap-2">
+                                    <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                    <CardTitle className="text-sm font-medium">
+                                        <span className="text-red-600 dark:text-red-400">Asks</span>
+                                    </CardTitle>
+                                </div>
                                 <CardDescription>
                                     {bookData.asks.length} sell orders
                                 </CardDescription>
@@ -219,15 +253,15 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-md m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
-                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                        <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-left align-middle font-medium">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-right align-middle font-medium">
                                                     Size
                                                 </th>
                                             </tr>
@@ -236,7 +270,10 @@ export default function Home() {
                                             {bookData.asks.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={2} className="h-24 text-center text-muted-foreground p-2">
-                                                        No ask orders
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <Users className="h-4 w-4" />
+                                                            No ask orders
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ) : (
@@ -262,7 +299,10 @@ export default function Home() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <div className="space-y-1">
-                                <CardTitle className="text-sm font-medium">Recent Trades</CardTitle>
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 text-muted-foreground" />
+                                    <CardTitle className="text-sm font-medium">Recent Trades</CardTitle>
+                                </div>
                                 <CardDescription>
                                     {trades.length} total executions
                                 </CardDescription>
@@ -272,18 +312,18 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-md m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
-                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                        <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-left align-middle font-medium">
                                                     Time
                                                 </th>
-                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-left align-middle font-medium">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                <th className="h-10 px-2 text-right align-middle font-medium">
                                                     Size
                                                 </th>
                                             </tr>
@@ -292,7 +332,10 @@ export default function Home() {
                                             {trades.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={3} className="h-24 text-center text-muted-foreground p-2">
-                                                        No trades yet
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <Activity className="h-4 w-4" />
+                                                            No trades yet
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ) : (

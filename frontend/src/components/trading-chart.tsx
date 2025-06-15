@@ -1,21 +1,9 @@
 "use client"
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
+import React, { useState, useRef, useEffect } from 'react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 interface Trade {
   price: number;
@@ -27,106 +15,102 @@ interface TradingChartProps {
   trades: Trade[];
 }
 
-const chartConfig = {
-  price: {
-    label: "Price",
-    color: "var(--primary)",
-  },
-} satisfies ChartConfig
-
 export function TradingChart({ trades }: TradingChartProps) {
-  const lastTradeCountRef = React.useRef(0);
-  const [chartData, setChartData] = React.useState<Array<{time: string; price: number; volume: number}>>([]);
+  const [chartData, setChartData] = useState<Array<{time: string, price: number, volume: number}>>([]);
+  const previousTradesLength = useRef(trades.length);
 
-  // Only update chart data when new trades are actually added
-  React.useEffect(() => {
-    if (trades.length === 0) {
-      setChartData([]);
-      lastTradeCountRef.current = 0;
-      return;
-    }
-
-    // Only update if we have new trades
-    if (trades.length !== lastTradeCountRef.current) {
-      const newData = trades
-        .slice(0, 25) // Reduced to 25 for even better performance
-        .reverse()
-        .map((trade) => ({
-          time: new Date(trade.timestamp).toLocaleTimeString('en-US', { 
-            hour12: false, 
-            minute: '2-digit', 
-            second: '2-digit' 
-          }),
-          price: trade.price,
-          volume: trade.quantity,
-        }));
+  // Update chart data when trades change
+  useEffect(() => {
+    if (trades.length > previousTradesLength.current) {
+      // Only update if we have new trades
+      const last25Trades = trades.slice(0, 25).reverse();
+      const newChartData = last25Trades.map((trade) => ({
+        time: new Date(trade.timestamp).toLocaleTimeString('en-US', {
+          hour12: false,
+          minute: '2-digit',
+          second: '2-digit'
+        }),
+        price: trade.price,
+        volume: trade.quantity
+      }));
       
-      setChartData(newData);
-      lastTradeCountRef.current = trades.length;
+      setChartData(newChartData);
+      previousTradesLength.current = trades.length;
     }
-  }, [trades.length, trades[0]?.timestamp]); // More specific dependencies
+  }, [trades]);
 
-  const currentPrice = trades.length > 0 ? trades[0].price : 0;
-  const priceChange = chartData.length > 1 ? 
-    ((chartData[chartData.length - 1].price - chartData[0].price) / chartData[0].price * 100) : 0;
+  const formatTooltip = (value: number | string, name: string) => {
+    if (name === 'price') {
+      return [`$${Number(value).toFixed(2)}`, 'Price'];
+    }
+    if (name === 'volume') {
+      return [Number(value).toLocaleString(), 'Volume'];
+    }
+    return [value, name];
+  };
 
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle>Price Chart</CardTitle>
-        <CardDescription>
-          Current: ${currentPrice.toFixed(2)}
-          {priceChange !== 0 && (
-            <span className={`ml-2 ${priceChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {priceChange > 0 ? '+' : ''}{priceChange.toFixed(2)}%
-            </span>
-          )}
-        </CardDescription>
+      <CardHeader>
+        <CardTitle>Price Movement</CardTitle>
+        <CardDescription>Last 25 trades • Real-time updates</CardDescription>
       </CardHeader>
-      <CardContent className="pb-4">
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
-          <AreaChart
-            data={chartData}
-            margin={{
-              left: 8,
-              right: 8,
-              top: 8,
-              bottom: 8,
-            }}
-          >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={6}
-              interval="preserveStartEnd"
-              tick={{ fontSize: 11 }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={6}
-              domain={['dataMin - 0.5', 'dataMax + 0.5']}
-              tick={{ fontSize: 11 }}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Area
-              dataKey="price"
-              type="monotone"
-              fill="var(--color-primary)"
-              fillOpacity={0.08}
-              stroke="var(--color-primary)"
-              strokeWidth={1.5}
-              dot={false}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ChartContainer>
+      <CardContent>
+        <div className="h-[300px] w-full">
+          {chartData.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin mr-2" />
+              Waiting for trade data...
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <XAxis 
+                  dataKey="time" 
+                  fontSize={12}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                />
+                <YAxis 
+                  domain={['dataMin - 0.01', 'dataMax + 0.01']}
+                  fontSize={12}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                  tickFormatter={(value) => `$${value.toFixed(2)}`}
+                />
+                <Tooltip
+                  formatter={formatTooltip}
+                  labelStyle={{ 
+                    color: 'hsl(var(--foreground))',
+                    backgroundColor: 'hsl(var(--background))'
+                  }}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  fill="url(#colorPrice)"
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 } 
