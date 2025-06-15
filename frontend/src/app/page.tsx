@@ -2,16 +2,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { TradingChart } from '@/components/trading-chart';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Separator } from "@/components/ui/separator"
 
 // Define types for WebSocket messages
 interface BookMessage {
@@ -61,7 +55,7 @@ export default function Home() {
                 setBookData(message.payload);
             } else if (message.type === 'trade') {
                 const newTrade = {...message.payload, timestamp: Date.now() };
-                setTrades(prevTrades => [newTrade, ...prevTrades.slice(0, 49)]); // Keep only last 50 trades
+                setTrades(prevTrades => [newTrade, ...prevTrades.slice(0, 99)]); // Keep only last 100 trades
             }
         }
     }, [lastJsonMessage]);
@@ -73,158 +67,156 @@ export default function Home() {
     const spreadPercent = topBid > 0 ? ((spread / topBid) * 100).toFixed(3) : '0.000';
     const lastTradePrice = trades.length > 0 ? trades[0].price : 0;
     const totalVolume = trades.reduce((sum, trade) => sum + trade.quantity, 0);
+    const totalTrades = trades.length;
+    
+    // Calculate session stats
+    const sessionHigh = trades.length > 0 ? Math.max(...trades.map(t => t.price)) : 0;
+    const sessionLow = trades.length > 0 ? Math.min(...trades.map(t => t.price)) : 0;
 
-    const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Connected',
-        [ReadyState.CLOSING]: 'Closing',
-        [ReadyState.CLOSED]: 'Disconnected',
-        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-    };
+    const isConnected = readyState === ReadyState.OPEN;
 
     return (
-        <SidebarProvider
-            style={
-                {
-                    "--sidebar-width": "calc(var(--spacing) * 72)",
-                    "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-            }
-        >
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-                <SiteHeader />
-                <div className="flex flex-1 flex-col">
-                    <div className="flex flex-1 flex-col gap-4 p-4">
-                        
-                        {/* Connection Status */}
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Trading Dashboard</h2>
-                            <Badge variant={readyState === ReadyState.OPEN ? "default" : "destructive"}>
-                                {connectionStatus[readyState]}
-                            </Badge>
-                        </div>
-
-                        {/* Market Overview Cards */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardDescription>Last Price</CardDescription>
-                                    <CardTitle className="text-2xl">${lastTradePrice.toFixed(2)}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                            
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardDescription>Spread</CardDescription>
-                                    <CardTitle className="text-2xl">${spread.toFixed(2)}</CardTitle>
-                                    <CardDescription>{spreadPercent}%</CardDescription>
-                                </CardHeader>
-                            </Card>
-                            
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardDescription>Volume</CardDescription>
-                                    <CardTitle className="text-2xl">{totalVolume.toLocaleString()}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                            
-                            <Card>
-                                <CardHeader className="pb-2">
-                                    <CardDescription>Best Bid/Ask</CardDescription>
-                                    <CardTitle className="text-xl">${topBid.toFixed(2)} / ${topAsk.toFixed(2)}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                        </div>
-
-                        {/* Order Book and Trades */}
-                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                            
-                            {/* Order Book - Bids */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Bids</CardTitle>
-                                    <CardDescription>Buy orders</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Price</TableHead>
-                                                <TableHead className="text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {bookData.bids.slice(0, 10).map(([price, size], index) => (
-                                                <TableRow key={`bid-${price}`}>
-                                                    <TableCell className="font-mono">{price}</TableCell>
-                                                    <TableCell className="text-right font-mono">{size}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-
-                            {/* Order Book - Asks */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Asks</CardTitle>
-                                    <CardDescription>Sell orders</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Price</TableHead>
-                                                <TableHead className="text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {bookData.asks.slice(0, 10).map(([price, size], index) => (
-                                                <TableRow key={`ask-${price}`}>
-                                                    <TableCell className="font-mono">{price}</TableCell>
-                                                    <TableCell className="text-right font-mono">{size}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-
-                            {/* Recent Trades */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Recent Trades</CardTitle>
-                                    <CardDescription>Latest executions</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Time</TableHead>
-                                                <TableHead>Price</TableHead>
-                                                <TableHead className="text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {trades.slice(0, 10).map((trade) => (
-                                                <TableRow key={trade.timestamp}>
-                                                    <TableCell className="font-mono">
-                                                        {new Date(trade.timestamp).toLocaleTimeString()}
-                                                    </TableCell>
-                                                    <TableCell className="font-mono">${trade.price.toFixed(2)}</TableCell>
-                                                    <TableCell className="text-right font-mono">{trade.quantity}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-                        </div>
+        <div className="min-h-screen bg-background p-4">
+            <div className="mx-auto max-w-7xl space-y-6">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">AlgoSim Trading Dashboard</h1>
+                        <p className="text-muted-foreground">Real-time algorithmic trading simulation and market data analysis</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'}`}></div>
+                        <Badge variant={isConnected ? "default" : "destructive"}>
+                            {isConnected ? 'Live' : 'Offline'}
+                        </Badge>
                     </div>
                 </div>
-            </SidebarInset>
-        </SidebarProvider>
+
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Project Goal</CardDescription>
+                            <CardTitle className="text-lg">Market Making Simulation</CardTitle>
+                            <CardDescription className="text-sm">Algorithmic trading strategy testing with real-time order book dynamics</CardDescription>
+                        </CardHeader>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Last Price</CardDescription>
+                            <CardTitle className="text-2xl tabular-nums">${lastTradePrice.toFixed(2)}</CardTitle>
+                            <CardDescription>Session: ${sessionLow.toFixed(2)} - ${sessionHigh.toFixed(2)}</CardDescription>
+                        </CardHeader>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Bid-Ask Spread</CardDescription>
+                            <CardTitle className="text-2xl tabular-nums">${spread.toFixed(2)}</CardTitle>
+                            <CardDescription>{spreadPercent}% of mid price</CardDescription>
+                        </CardHeader>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Activity</CardDescription>
+                            <CardTitle className="text-2xl tabular-nums">{totalTrades}</CardTitle>
+                            <CardDescription>Trades • Volume: {totalVolume.toLocaleString()}</CardDescription>
+                        </CardHeader>
+                    </Card>
+                </div>
+
+                {/* Trading Chart */}
+                <TradingChart trades={trades} />
+
+                {/* Order Book and Trades */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    
+                    {/* Order Book - Bids */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-green-700 dark:text-green-400">Bids</CardTitle>
+                            <CardDescription>Buy orders</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead className="text-right">Size</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {bookData.bids.slice(0, 10).map(([price, size], index) => (
+                                        <TableRow key={`bid-${price}`} className="bg-green-50/30 dark:bg-green-950/20">
+                                            <TableCell className="font-mono text-green-700 dark:text-green-400">{price}</TableCell>
+                                            <TableCell className="text-right font-mono text-green-700 dark:text-green-400">{size}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {/* Order Book - Asks */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-red-700 dark:text-red-400">Asks</CardTitle>
+                            <CardDescription>Sell orders</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead className="text-right">Size</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {bookData.asks.slice(0, 10).map(([price, size], index) => (
+                                        <TableRow key={`ask-${price}`} className="bg-red-50/30 dark:bg-red-950/20">
+                                            <TableCell className="font-mono text-red-700 dark:text-red-400">{price}</TableCell>
+                                            <TableCell className="text-right font-mono text-red-700 dark:text-red-400">{size}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {/* Recent Trades */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent Trades</CardTitle>
+                            <CardDescription>Latest executions</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Time</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead className="text-right">Size</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {trades.slice(0, 10).map((trade) => (
+                                        <TableRow key={trade.timestamp}>
+                                            <TableCell className="font-mono text-xs">
+                                                {new Date(trade.timestamp).toLocaleTimeString()}
+                                            </TableCell>
+                                            <TableCell className="font-mono">${trade.price.toFixed(2)}</TableCell>
+                                            <TableCell className="text-right font-mono">{trade.quantity}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
     );
 }
