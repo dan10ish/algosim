@@ -1,14 +1,14 @@
 #pragma once
+#include <chrono>
 #include <cstdint>
 #include <string>
-#include <chrono>
 
-enum class OrderSide {BUY, SELL};
+enum class OrderSide { BUY, SELL };
 
-struct Order{
+struct Order {
   uint64_t id;
-  OrderSide side;
-  double price;
-  uint32_t quantity;
-  std::chrono::system_clock::time_point timestamp;
+  OrderSide side;    // Buy or Sell
+  double price;      // Price of order
+  uint32_t quantity; // number of units to be traded
+  std::chrono::system_clock::time_point timestamp; // for time priority matching
 };
