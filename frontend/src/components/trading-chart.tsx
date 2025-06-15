@@ -35,13 +35,13 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function TradingChart({ trades }: TradingChartProps) {
-  // Convert trades to chart data format
+  // Convert trades to chart data format with memoization for performance
   const chartData = React.useMemo(() => {
     if (trades.length === 0) return [];
     
-    // Take last 50 trades and format for chart
+    // Take last 30 trades for better performance and format for chart
     return trades
-      .slice(0, 50)
+      .slice(0, 30)
       .reverse()
       .map((trade, index) => ({
         time: new Date(trade.timestamp).toLocaleTimeString('en-US', { 
@@ -52,7 +52,7 @@ export function TradingChart({ trades }: TradingChartProps) {
         price: trade.price,
         volume: trade.quantity,
       }));
-  }, [trades]);
+  }, [trades.slice(0, 30).map(t => `${t.timestamp}-${t.price}`).join(',')]);
 
   const currentPrice = trades.length > 0 ? trades[0].price : 0;
   const priceChange = chartData.length > 1 ? 
@@ -60,10 +60,10 @@ export function TradingChart({ trades }: TradingChartProps) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <CardTitle>Price Chart</CardTitle>
         <CardDescription>
-          Real-time price movement • Current: ${currentPrice.toFixed(2)}
+          Current: ${currentPrice.toFixed(2)}
           {priceChange !== 0 && (
             <span className={`ml-2 ${priceChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {priceChange > 0 ? '+' : ''}{priceChange.toFixed(2)}%
@@ -71,33 +71,33 @@ export function TradingChart({ trades }: TradingChartProps) {
           )}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="pb-4">
+        <ChartContainer config={chartConfig} className="h-[200px] w-full">
           <AreaChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
-              right: 12,
-              top: 12,
-              bottom: 12,
+              left: 8,
+              right: 8,
+              top: 8,
+              bottom: 8,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
               dataKey="time"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={6}
               interval="preserveStartEnd"
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 11 }}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
-              domain={['dataMin - 1', 'dataMax + 1']}
-              tick={{ fontSize: 12 }}
+              tickMargin={6}
+              domain={['dataMin - 0.5', 'dataMax + 0.5']}
+              tick={{ fontSize: 11 }}
             />
             <ChartTooltip
               cursor={false}
@@ -105,11 +105,12 @@ export function TradingChart({ trades }: TradingChartProps) {
             />
             <Area
               dataKey="price"
-              type="linear"
+              type="monotone"
               fill="var(--color-primary)"
               fillOpacity={0.1}
               stroke="var(--color-primary)"
-              strokeWidth={2}
+              strokeWidth={1.5}
+              dot={false}
             />
           </AreaChart>
         </ChartContainer>

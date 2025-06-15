@@ -72,6 +72,10 @@ export default function Home() {
     // Calculate session stats
     const sessionHigh = trades.length > 0 ? Math.max(...trades.map(t => t.price)) : 0;
     const sessionLow = trades.length > 0 ? Math.min(...trades.map(t => t.price)) : 0;
+    
+    // Calculate market depth (sum of top 5 levels)
+    const bidDepth = bookData.bids.slice(0, 5).reduce((sum, [, size]) => sum + size, 0);
+    const askDepth = bookData.asks.slice(0, 5).reduce((sum, [, size]) => sum + size, 0);
 
     const isConnected = readyState === ReadyState.OPEN;
 
@@ -86,8 +90,14 @@ export default function Home() {
                         <p className="text-muted-foreground">Real-time algorithmic trading simulation and market data analysis</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'}`}></div>
-                        <Badge variant={isConnected ? "default" : "destructive"}>
+                        <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400 animate-pulse'}`}></div>
+                        <Badge 
+                            variant={isConnected ? "default" : "destructive"}
+                            className={isConnected 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50' 
+                                : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'
+                            }
+                        >
                             {isConnected ? 'Live' : 'Offline'}
                         </Badge>
                     </div>
@@ -97,9 +107,9 @@ export default function Home() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardDescription>Project Goal</CardDescription>
-                            <CardTitle className="text-lg">Market Making Simulation</CardTitle>
-                            <CardDescription className="text-sm">Algorithmic trading strategy testing with real-time order book dynamics</CardDescription>
+                            <CardDescription>Best Bid/Ask</CardDescription>
+                            <CardTitle className="text-lg tabular-nums">${topBid.toFixed(2)} / ${topAsk.toFixed(2)}</CardTitle>
+                            <CardDescription className="text-sm">Market depth: {bidDepth.toFixed(0)} / {askDepth.toFixed(0)}</CardDescription>
                         </CardHeader>
                     </Card>
                     
@@ -136,83 +146,89 @@ export default function Home() {
                     
                     {/* Order Book - Bids */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="pb-3">
                             <CardTitle className="text-green-700 dark:text-green-400">Bids</CardTitle>
                             <CardDescription>Buy orders</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead className="text-right">Size</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {bookData.bids.slice(0, 10).map(([price, size], index) => (
-                                        <TableRow key={`bid-${price}`} className="bg-green-50/30 dark:bg-green-950/20">
-                                            <TableCell className="font-mono text-green-700 dark:text-green-400">{price}</TableCell>
-                                            <TableCell className="text-right font-mono text-green-700 dark:text-green-400">{size}</TableCell>
+                        <CardContent className="p-0">
+                            <div className="relative max-h-[400px] overflow-auto">
+                                <Table>
+                                    <TableHeader className="sticky top-0 bg-card z-10">
+                                        <TableRow>
+                                            <TableHead className="bg-card">Price</TableHead>
+                                            <TableHead className="text-right bg-card">Size</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {bookData.bids.map(([price, size], index) => (
+                                            <TableRow key={`bid-${price}`} className="bg-green-50/30 dark:bg-green-950/20">
+                                                <TableCell className="font-mono text-green-700 dark:text-green-400">{price}</TableCell>
+                                                <TableCell className="text-right font-mono text-green-700 dark:text-green-400">{size}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
 
                     {/* Order Book - Asks */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="pb-3">
                             <CardTitle className="text-red-700 dark:text-red-400">Asks</CardTitle>
                             <CardDescription>Sell orders</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead className="text-right">Size</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {bookData.asks.slice(0, 10).map(([price, size], index) => (
-                                        <TableRow key={`ask-${price}`} className="bg-red-50/30 dark:bg-red-950/20">
-                                            <TableCell className="font-mono text-red-700 dark:text-red-400">{price}</TableCell>
-                                            <TableCell className="text-right font-mono text-red-700 dark:text-red-400">{size}</TableCell>
+                        <CardContent className="p-0">
+                            <div className="relative max-h-[400px] overflow-auto">
+                                <Table>
+                                    <TableHeader className="sticky top-0 bg-card z-10">
+                                        <TableRow>
+                                            <TableHead className="bg-card">Price</TableHead>
+                                            <TableHead className="text-right bg-card">Size</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {bookData.asks.map(([price, size], index) => (
+                                            <TableRow key={`ask-${price}`} className="bg-red-50/30 dark:bg-red-950/20">
+                                                <TableCell className="font-mono text-red-700 dark:text-red-400">{price}</TableCell>
+                                                <TableCell className="text-right font-mono text-red-700 dark:text-red-400">{size}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
 
                     {/* Recent Trades */}
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="pb-3">
                             <CardTitle>Recent Trades</CardTitle>
                             <CardDescription>Latest executions</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Time</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead className="text-right">Size</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {trades.slice(0, 10).map((trade) => (
-                                        <TableRow key={trade.timestamp}>
-                                            <TableCell className="font-mono text-xs">
-                                                {new Date(trade.timestamp).toLocaleTimeString()}
-                                            </TableCell>
-                                            <TableCell className="font-mono">${trade.price.toFixed(2)}</TableCell>
-                                            <TableCell className="text-right font-mono">{trade.quantity}</TableCell>
+                        <CardContent className="p-0">
+                            <div className="relative max-h-[400px] overflow-auto">
+                                <Table>
+                                    <TableHeader className="sticky top-0 bg-card z-10">
+                                        <TableRow>
+                                            <TableHead className="bg-card">Time</TableHead>
+                                            <TableHead className="bg-card">Price</TableHead>
+                                            <TableHead className="text-right bg-card">Size</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {trades.map((trade) => (
+                                            <TableRow key={trade.timestamp}>
+                                                <TableCell className="font-mono text-xs">
+                                                    {new Date(trade.timestamp).toLocaleTimeString()}
+                                                </TableCell>
+                                                <TableCell className="font-mono">${trade.price.toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-mono">{trade.quantity}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
