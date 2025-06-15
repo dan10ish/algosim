@@ -1,0 +1,34 @@
+# algosim-monorepo/docker-compose.yml
+version: '3.8'
+
+# Defines the services (containers) that make up the application.
+services:
+  # The C++ backend service.
+  backend:
+    build:./backend # Specifies the directory containing the Dockerfile.
+    container_name: backend # A friendly name for the container.
+    # This service does not expose any ports to the host machine.
+    # It communicates with the api-bridge over the internal Docker network.
+
+  # The Python API bridge service.
+  api:
+    build:./api
+    container_name: api
+    ports:
+      # Maps port 8001 on the host to port 8000 in the container.
+      # This makes the WebSocket server accessible from our browser at localhost:8001.
+      - "8001:8000"
+    depends_on:
+      # Ensures that the 'backend-cpp' service is started before this one.
+      - backend
+
+  # The Next.js frontend service.
+  frontend:
+    build:./frontend
+    container_name: frontend
+    ports:
+      # Maps port 3000 on the host to port 80 in the container (where Nginx is running).
+      - "3000:80"
+    depends_on:
+      # Ensures that the 'api-bridge-python' service is started before this one.
+      - api
