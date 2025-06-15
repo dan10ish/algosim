@@ -163,37 +163,41 @@ export default function Home() {
                                 {bidDepth.toFixed(0)}
                             </Badge>
                         </CardHeader>
-                        <CardContent>
-                            <div className="rounded-md border">
-                                <div className="relative max-h-[350px] overflow-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="sticky top-0 bg-background">Price</TableHead>
-                                                <TableHead className="sticky top-0 bg-background text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
+                        <CardContent className="p-0">
+                            <div className="border rounded-md m-6 mt-0">
+                                <div className="h-[350px] overflow-auto">
+                                    <table className="w-full text-sm">
+                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                            <tr>
+                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                    Price
+                                                </th>
+                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                    Size
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             {bookData.bids.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
+                                                <tr>
+                                                    <td colSpan={2} className="h-24 text-center text-muted-foreground p-2">
                                                         No bid orders
-                                                    </TableCell>
-                                                </TableRow>
+                                                    </td>
+                                                </tr>
                                             ) : (
                                                 bookData.bids.map(([price, size]) => (
-                                                    <TableRow key={`bid-${price}`} className="hover:bg-green-50/50 dark:hover:bg-green-950/20">
-                                                        <TableCell className="font-mono text-green-600 dark:text-green-400">
+                                                    <tr key={`bid-${price}`} className="border-b transition-colors hover:bg-green-50/50 dark:hover:bg-green-950/20">
+                                                        <td className="p-2 font-mono text-green-600 dark:text-green-400">
                                                             ${price}
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-mono text-green-700 dark:text-green-300">
+                                                        </td>
+                                                        <td className="p-2 text-right font-mono text-green-700 dark:text-green-300">
                                                             {size.toLocaleString()}
-                                                        </TableCell>
-                                                    </TableRow>
+                                                        </td>
+                                                    </tr>
                                                 ))
                                             )}
-                                        </TableBody>
-                                    </Table>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </CardContent>
@@ -214,37 +218,41 @@ export default function Home() {
                                 {askDepth.toFixed(0)}
                             </Badge>
                         </CardHeader>
-                        <CardContent>
-                            <div className="rounded-md border">
-                                <div className="relative max-h-[350px] overflow-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="sticky top-0 bg-background">Price</TableHead>
-                                                <TableHead className="sticky top-0 bg-background text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
+                        <CardContent className="p-0">
+                            <div className="border rounded-md m-6 mt-0">
+                                <div className="h-[350px] overflow-auto">
+                                    <table className="w-full text-sm">
+                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                            <tr>
+                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                    Price
+                                                </th>
+                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                    Size
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             {bookData.asks.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
+                                                <tr>
+                                                    <td colSpan={2} className="h-24 text-center text-muted-foreground p-2">
                                                         No ask orders
-                                                    </TableCell>
-                                                </TableRow>
+                                                    </td>
+                                                </tr>
                                             ) : (
                                                 bookData.asks.map(([price, size]) => (
-                                                    <TableRow key={`ask-${price}`} className="hover:bg-red-50/50 dark:hover:bg-red-950/20">
-                                                        <TableCell className="font-mono text-red-600 dark:text-red-400">
+                                                    <tr key={`ask-${price}`} className="border-b transition-colors hover:bg-red-50/50 dark:hover:bg-red-950/20">
+                                                        <td className="p-2 font-mono text-red-600 dark:text-red-400">
                                                             ${price}
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-mono text-red-700 dark:text-red-300">
+                                                        </td>
+                                                        <td className="p-2 text-right font-mono text-red-700 dark:text-red-300">
                                                             {size.toLocaleString()}
-                                                        </TableCell>
-                                                    </TableRow>
+                                                        </td>
+                                                    </tr>
                                                 ))
                                             )}
-                                        </TableBody>
-                                    </Table>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </CardContent>
@@ -263,41 +271,47 @@ export default function Home() {
                                 {tradesPerMinute}/min
                             </Badge>
                         </CardHeader>
-                        <CardContent>
-                            <div className="rounded-md border">
-                                <div className="relative max-h-[350px] overflow-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="sticky top-0 bg-background">Time</TableHead>
-                                                <TableHead className="sticky top-0 bg-background">Price</TableHead>
-                                                <TableHead className="sticky top-0 bg-background text-right">Size</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
+                        <CardContent className="p-0">
+                            <div className="border rounded-md m-6 mt-0">
+                                <div className="h-[350px] overflow-auto">
+                                    <table className="w-full text-sm">
+                                        <thead className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/95">
+                                            <tr>
+                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                    Time
+                                                </th>
+                                                <th className="h-10 px-2 text-left align-middle font-medium text-foreground">
+                                                    Price
+                                                </th>
+                                                <th className="h-10 px-2 text-right align-middle font-medium text-foreground">
+                                                    Size
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             {trades.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
+                                                <tr>
+                                                    <td colSpan={3} className="h-24 text-center text-muted-foreground p-2">
                                                         No trades yet
-                                                    </TableCell>
-                                                </TableRow>
+                                                    </td>
+                                                </tr>
                                             ) : (
                                                 trades.map((trade) => (
-                                                    <TableRow key={trade.timestamp}>
-                                                        <TableCell className="font-mono text-xs text-muted-foreground">
+                                                    <tr key={trade.timestamp} className="border-b transition-colors hover:bg-muted/50">
+                                                        <td className="p-2 font-mono text-xs text-muted-foreground">
                                                             {new Date(trade.timestamp).toLocaleTimeString()}
-                                                        </TableCell>
-                                                        <TableCell className="font-mono">
+                                                        </td>
+                                                        <td className="p-2 font-mono">
                                                             ${trade.price.toFixed(2)}
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-mono">
+                                                        </td>
+                                                        <td className="p-2 text-right font-mono">
                                                             {trade.quantity.toLocaleString()}
-                                                        </TableCell>
-                                                    </TableRow>
+                                                        </td>
+                                                    </tr>
                                                 ))
                                             )}
-                                        </TableBody>
-                                    </Table>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </CardContent>
