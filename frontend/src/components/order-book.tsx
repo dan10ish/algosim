@@ -8,8 +8,8 @@ type OrderLevel = [string, number];
 
 // Define the structure for the entire order book data.
 interface OrderBookData {
-    bids: OrderLevel;
-    asks: OrderLevel;
+    bids: OrderLevel[];
+    asks: OrderLevel[];
 }
 
 // Define the props for our component.

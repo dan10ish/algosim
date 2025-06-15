@@ -9,7 +9,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y cmake libzmq3-dev
 
 # Copy all source code from the local 'backend-cpp' directory into the container's /app directory.
-COPY..
+COPY . .
 
 # Create a build directory to keep build artifacts separate from source code.
 RUN mkdir build
@@ -31,7 +31,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y libzmq5 && rm -rf /var/lib/apt/lists/*
 
 # Copy only the compiled executable from the 'builder' stage into the final image.
-COPY --from=builder /app/build/algosim_engine.
+COPY --from=builder /app/build/algosim_engine .
 
 # Set the default command to run when the container starts.
 CMD ["./algosim_engine"]

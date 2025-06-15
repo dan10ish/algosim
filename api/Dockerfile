@@ -4,14 +4,14 @@ WORKDIR /app
 
 # Copy the requirements file first to leverage Docker's layer caching.
 # This layer will only be rebuilt if requirements.txt changes.
-COPY requirements.txt.
+COPY requirements.txt .
 
 # Install the Python dependencies.
 # --no-cache-dir reduces image size by not storing the pip cache.
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code.
-COPY main.py.
+COPY main.py .
 
 # Expose port 8000 to allow traffic to the Uvicorn server inside the container.
 EXPOSE 8000

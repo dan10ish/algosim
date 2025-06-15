@@ -7,9 +7,9 @@ import { TradeLog, Trade } from '@/components/trade-log';
 
 export default function Home() {
     // State for the order book data.
-    const = useState({ bids:, asks: });
+    const [bookData, setBookData] = useState({ bids: [], asks: [] });
     // State for the list of trades.
-    const = useState<Trade>();
+    const [trades, setTrades] = useState<Trade[]>([]);
 
     // The URL of our Python WebSocket bridge.
     // Note: We use 8001 because that's the port we mapped in docker-compose.yml.
@@ -32,25 +32,25 @@ export default function Home() {
                 // Add the new trade to the beginning of the trades array.
                 // Also add a timestamp for unique keying and display.
                 const newTrade = {...message.payload, timestamp: Date.now() };
-                setTrades(prevTrades =>);
+                setTrades(prevTrades => [newTrade, ...prevTrades]);
             }
         }
     }, [lastJsonMessage]); // The dependency array ensures this hook only runs when lastJsonMessage changes.
 
     // A mapping from ReadyState enum to human-readable strings.
     const connectionStatus = {
-       : 'Connecting',
-       : 'Open',
-       : 'Closing',
-       : 'Closed',
-       : 'Uninstantiated',
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     };
 
     return (
         <main className="container mx-auto p-4 bg-gray-900 text-white min-h-screen">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">AlgoSim Real-Time Dashboard</h1>
-                <p>Connection: <span className={readyState === ReadyState.OPEN? 'text-green-500' : 'text-red-500'}>{connectionStatus}</span></p>
+                <p>Connection: <span className={readyState === ReadyState.OPEN ? 'text-green-500' : 'text-red-500'}>{connectionStatus[readyState]}</span></p>
             </div>
 
             <OrderBook data={bookData} />

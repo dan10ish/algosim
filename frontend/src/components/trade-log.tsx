@@ -18,7 +18,7 @@ export interface Trade {
 }
 
 interface TradeLogProps {
-  trades: Trade;
+  trades: Trade[];
 }
 
 export function TradeLog({ trades }: TradeLogProps) {

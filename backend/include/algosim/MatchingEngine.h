@@ -25,7 +25,7 @@ public:
   void process(const Order &order);
 
 private:
-  // Algo to attmept to match bids and asks
+  // Algo to attempt to match bids and asks
   void match();
   
   // Serializes the current order book state into a JSON string

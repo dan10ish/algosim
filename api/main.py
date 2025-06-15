@@ -12,7 +12,7 @@ app = FastAPI()
 class ConnectionManager:
     def __init__(self):
         # A list to store active WebSocket connection objects.
-        self.active_connections: List =
+        self.active_connections: List[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         # Accept a new WebSocket connection.
@@ -38,12 +38,12 @@ async def zmq_listener():
     context = zmq.asyncio.Context()
     # Create a SUB (Subscriber) socket.
     socket = context.socket(zmq.SUB)
-    # Connect to the C++ backend service. 'backend-cpp' is the service name defined in docker-compose.yml.
-    socket.connect("tcp://backend-cpp:5555")
+    # Connect to the C++ backend service. 'backend' is the service name defined in docker-compose.yml.
+    socket.connect("tcp://backend:5555")
     # Subscribe to all topics. An empty string subscribes to everything.
     socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-    print("ZMQ Listener started, connected to tcp://backend-cpp:5555")
+    print("ZMQ Listener started, connected to tcp://backend:5555")
 
     # Loop indefinitely to receive messages.
     while True:
@@ -57,6 +57,7 @@ async def zmq_listener():
             await asyncio.sleep(1) # Avoid tight loop on error
 
 # This event handler runs when the FastAPI application starts.
+# Note: Using lifespan context manager is preferred in newer FastAPI versions
 @app.on_event("startup")
 async def startup_event():
     # Create the zmq_listener as a background task that runs concurrently with the web server.

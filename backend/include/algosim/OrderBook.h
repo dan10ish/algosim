@@ -1,9 +1,8 @@
 #pragma once
 #include "Order.h"
-#include <functional>
+#include <functional> // For std::greater
 #include <map>
 #include <queue>
-#include <functional> // For std::greater
 
 class OrderBook {
 public:

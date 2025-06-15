@@ -5,14 +5,14 @@ version: '3.8'
 services:
   # The C++ backend service.
   backend:
-    build:./backend # Specifies the directory containing the Dockerfile.
+    build: ./backend # Specifies the directory containing the Dockerfile.
     container_name: backend # A friendly name for the container.
     # This service does not expose any ports to the host machine.
     # It communicates with the api-bridge over the internal Docker network.
 
   # The Python API bridge service.
   api:
-    build:./api
+    build: ./api
     container_name: api
     ports:
       # Maps port 8001 on the host to port 8000 in the container.
@@ -24,7 +24,7 @@ services:
 
   # The Next.js frontend service.
   frontend:
-    build:./frontend
+    build: ./frontend
     container_name: frontend
     ports:
       # Maps port 3000 on the host to port 80 in the container (where Nginx is running).

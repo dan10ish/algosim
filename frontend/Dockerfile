@@ -4,13 +4,13 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # Copy package.json and lock files to install dependencies.
-COPY package*.json./
+COPY package*.json ./
 
 # Install dependencies.
 RUN npm install
 
 # Copy the rest of the application source code.
-COPY..
+COPY . .
 
 # Add the output: 'export' configuration to next.config.mjs for static export
 # This is a workaround to ensure the build produces static files for Nginx.

@@ -25,7 +25,6 @@ include_directories(include)
 
 add_executable(algosim_engine
   src/main.cpp
-  src/Order.cpp
   src/OrderBook.cpp
   src/MatchingEngine.cpp
   src/ZeroMQPublisher.cpp

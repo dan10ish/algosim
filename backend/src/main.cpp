@@ -9,7 +9,7 @@
 
 int main() {
   try {
-    // Create a ZeroMQ publisher that binds to al network interfaces on port
+    // Create a ZeroMQ publisher that binds to all network interfaces on port
     // 5555
     ZeroMQPublisher publisher("tcp://*:5555");
     std::cout << "Publisher bound to tcp://*:5555" << std::endl;
@@ -32,7 +32,7 @@ int main() {
     while (true) {
       Order new_order;
       new_order.id = ++order_id_counter;
-      // Alternate between buy and seel orders
+      // Alternate between buy and sell orders
       new_order.side =
           (order_id_counter % 2 == 0) ? OrderSide::BUY : OrderSide::SELL;
       // Generate random price and round it to 2 decimal places
@@ -56,7 +56,7 @@ int main() {
     std::cerr << "ZeroMQ error: " << e.what() << std::endl;
     return 1;
   } catch (const std::exception &e) {
-    // Catch and reprt any other standard exceptions
+    // Catch and report any other standard exceptions
     std::cerr << "Error: " << e.what() << std::endl;
     return 1;
   }
