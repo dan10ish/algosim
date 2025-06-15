@@ -192,15 +192,15 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-lg m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0 overflow-hidden">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
                                         <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium">
+                                                <th className="h-10 px-2 text-left align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium">
+                                                <th className="h-10 px-2 text-right align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Size
                                                 </th>
                                             </tr>
@@ -253,15 +253,15 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-lg m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0 overflow-hidden">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
                                         <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium">
+                                                <th className="h-10 px-2 text-left align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium">
+                                                <th className="h-10 px-2 text-right align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Size
                                                 </th>
                                             </tr>
@@ -312,18 +312,18 @@ export default function Home() {
                             </Badge>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <div className="border rounded-lg m-6 mt-0">
+                            <div className="border rounded-lg m-6 mt-0 overflow-hidden">
                                 <div className="h-[350px] overflow-auto">
                                     <table className="w-full text-sm">
                                         <thead className="sticky top-0 z-10 border-b bg-foreground text-background">
                                             <tr>
-                                                <th className="h-10 px-2 text-left align-middle font-medium">
+                                                <th className="h-10 px-2 text-left align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Time
                                                 </th>
                                                 <th className="h-10 px-2 text-left align-middle font-medium">
                                                     Price
                                                 </th>
-                                                <th className="h-10 px-2 text-right align-middle font-medium">
+                                                <th className="h-10 px-2 text-right align-middle font-medium first:rounded-tl-lg last:rounded-tr-lg">
                                                     Size
                                                 </th>
                                             </tr>
