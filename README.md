@@ -1,4 +1,6 @@
-# AlgoSim - Real-Time Algorithmic Trading Simulation Dashboard
+# AlgoSim 
+
+> Real-Time Trading Simulation Dashboard
 
 A sophisticated, real-time trading simulation platform that demonstrates advanced full-stack development skills through live market data visualization, WebSocket integration, and modern UI/UX design patterns.
 
