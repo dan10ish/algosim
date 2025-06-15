@@ -5,9 +5,28 @@ import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { OrderBook } from '@/components/order-book';
 import { TradeLog, Trade } from '@/components/trade-log';
 
+// Define types for WebSocket messages
+interface BookMessage {
+    type: 'book';
+    payload: {
+        bids: [string, number][];
+        asks: [string, number][];
+    };
+}
+
+interface TradeMessage {
+    type: 'trade';
+    payload: {
+        price: number;
+        quantity: number;
+    };
+}
+
+type WebSocketMessage = BookMessage | TradeMessage;
+
 export default function Home() {
     // State for the order book data.
-    const [bookData, setBookData] = useState({ bids: [], asks: [] });
+    const [bookData, setBookData] = useState<{ bids: [string, number][]; asks: [string, number][] }>({ bids: [], asks: [] });
     // State for the list of trades.
     const [trades, setTrades] = useState<Trade[]>([]);
 
@@ -17,13 +36,13 @@ export default function Home() {
 
     // The useWebSocket hook from react-use-websocket.
     const { lastJsonMessage, readyState } = useWebSocket(WS_URL, {
-        shouldReconnect: (closeEvent) => true, // Automatically reconnect on close.
+        shouldReconnect: () => true, // Automatically reconnect on close.
     });
 
     // This useEffect hook runs whenever a new JSON message is received from the WebSocket.
     useEffect(() => {
         if (lastJsonMessage) {
-            const message = lastJsonMessage as any; // Cast to 'any' for simplicity
+            const message = lastJsonMessage as WebSocketMessage;
 
             // Check the 'type' field of the message to decide how to update state.
             if (message.type === 'book') {

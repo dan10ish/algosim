@@ -22,12 +22,12 @@ RUN cmake -S. -B build -DCMAKE_BUILD_TYPE=Release
 RUN cmake --build build
 
 # --- Stage 2: The Final Runtime Image ---
-# Start from a minimal base image to keep the final container small and secure.
-FROM debian:bullseye-slim
+# Use a more recent base image that has compatible glibc versions
+FROM debian:bookworm-slim
 WORKDIR /app
 
 # Install only the runtime dependency: the ZeroMQ shared library (libzmq5).
-# The '&& rm -rf /var/lib/apt/lists/*' cleans up apt cache to reduce image size.
+# Since we're using the same base image, libzmq3-dev is already available, but we still need the runtime lib
 RUN apt-get update && apt-get install -y libzmq5 && rm -rf /var/lib/apt/lists/*
 
 # Copy only the compiled executable from the 'builder' stage into the final image.

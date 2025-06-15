@@ -12,9 +12,7 @@ RUN npm install
 # Copy the rest of the application source code.
 COPY . .
 
-# Add the output: 'export' configuration to next.config.mjs for static export
-# This is a workaround to ensure the build produces static files for Nginx.
-RUN echo "/** @type {import('next').NextConfig} */\nconst nextConfig = { output: 'export' };\n\nexport default nextConfig;" > next.config.mjs
+# The next.config.ts already includes output: 'export' for static export to work with Nginx
 
 # Build the Next.js application for production. This creates static files in the 'out' directory.
 RUN npm run build
