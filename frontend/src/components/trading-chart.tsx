@@ -35,24 +35,36 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function TradingChart({ trades }: TradingChartProps) {
-  // Convert trades to chart data format with memoization for performance
-  const chartData = React.useMemo(() => {
-    if (trades.length === 0) return [];
-    
-    // Take last 30 trades for better performance and format for chart
-    return trades
-      .slice(0, 30)
-      .reverse()
-      .map((trade, index) => ({
-        time: new Date(trade.timestamp).toLocaleTimeString('en-US', { 
-          hour12: false, 
-          minute: '2-digit', 
-          second: '2-digit' 
-        }),
-        price: trade.price,
-        volume: trade.quantity,
-      }));
-  }, [trades.slice(0, 30).map(t => `${t.timestamp}-${t.price}`).join(',')]);
+  const lastTradeCountRef = React.useRef(0);
+  const [chartData, setChartData] = React.useState<Array<{time: string; price: number; volume: number}>>([]);
+
+  // Only update chart data when new trades are actually added
+  React.useEffect(() => {
+    if (trades.length === 0) {
+      setChartData([]);
+      lastTradeCountRef.current = 0;
+      return;
+    }
+
+    // Only update if we have new trades
+    if (trades.length !== lastTradeCountRef.current) {
+      const newData = trades
+        .slice(0, 25) // Reduced to 25 for even better performance
+        .reverse()
+        .map((trade) => ({
+          time: new Date(trade.timestamp).toLocaleTimeString('en-US', { 
+            hour12: false, 
+            minute: '2-digit', 
+            second: '2-digit' 
+          }),
+          price: trade.price,
+          volume: trade.quantity,
+        }));
+      
+      setChartData(newData);
+      lastTradeCountRef.current = trades.length;
+    }
+  }, [trades.length, trades[0]?.timestamp]); // More specific dependencies
 
   const currentPrice = trades.length > 0 ? trades[0].price : 0;
   const priceChange = chartData.length > 1 ? 
@@ -74,7 +86,6 @@ export function TradingChart({ trades }: TradingChartProps) {
       <CardContent className="pb-4">
         <ChartContainer config={chartConfig} className="h-[200px] w-full">
           <AreaChart
-            accessibilityLayer
             data={chartData}
             margin={{
               left: 8,
@@ -107,10 +118,11 @@ export function TradingChart({ trades }: TradingChartProps) {
               dataKey="price"
               type="monotone"
               fill="var(--color-primary)"
-              fillOpacity={0.1}
+              fillOpacity={0.08}
               stroke="var(--color-primary)"
               strokeWidth={1.5}
               dot={false}
+              isAnimationActive={false}
             />
           </AreaChart>
         </ChartContainer>
